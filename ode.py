@@ -124,7 +124,7 @@ def ode_next_adams(function, x, y, h):
     finite_difference_r2 = f[-1] - 2 * f[-2] + f[-3]
     finite_difference_r3 = f[-1] - 3 * f[-2] + 3 * f[-3] - f[-4]
 
-    y_next = y[-1] + h * f[-1] + h ** 2 * finite_difference_r1 * (1 / 2) + \
-             h ** 3 * finite_difference_r2 * (5 / 12) + \
-             h ** 4 * finite_difference_r3 * (3 / 8)
+    y_next = y[-1] + h * f[-1] + h * finite_difference_r1 * (1 / 2) + \
+             h * finite_difference_r2 * (5 / 12) + \
+             h * finite_difference_r3 * (3 / 8)
     return y_next
