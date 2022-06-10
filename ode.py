@@ -6,7 +6,7 @@ import lagrange
 
 
 class InterpolatableFunction:
-    def __init__(self, action, solution, str_rep_action, str_rep_solution, ):
+    def __init__(self, action, solution, str_rep_solution, str_rep_action):
         self.action = action
         self.solution = solution
         self.str_rep = str_rep_action
@@ -15,13 +15,13 @@ class InterpolatableFunction:
 
 def solve_ode():
     od_equations = [InterpolatableFunction(lambda _x, _y: _x ** 2 - math.sin(2 * _x),
-                                           lambda _x, c1: math.cos(2*_x)/2 + _x**3/3 + c1,
+                                           lambda _x, c1: math.cos(2*_x)/2 + (_x**3)/3 + c1,
                                            "y' = x^2 - sin(2x)", "y = cos(2x)/2 + x^3/3 + C"),
-                    InterpolatableFunction(lambda _x, _y: _y + (_y ** 2) * (1 + _x),
-                                           lambda _x, c1: -math.exp(_x)/(_x*math.exp(_x)+c1),
-                                           "y' = y + y^2 + xy^2", "y = -exp(x)/(x * exp(x) + C)"),
+                    InterpolatableFunction(lambda _x, _y: 3*(_x**3) + 2*(_x**2) - _y,
+                                           lambda _x, c1: 3*(_x**3) - 7*(_x**2) + 14*_x -14 + c1/math.exp(_x),
+                                           "y' = 3x^3 + 2x^2 - y", "y = 3x^3 -7x^2 +14x -14 + C/exp(x)"),
                     InterpolatableFunction(lambda _x, _y: _x ** 2 - 2 * _y,
-                                           lambda _x, c1: _x ** 2 / 2 - _x / 2 + 0.25 + c1 / math.exp(2 * _x),
+                                           lambda _x, c1: 0.5*(_x ** 2) - 0.25*(2 * _x - 1) + c1 / math.exp(2 * _x),
                                            "y' = x^2 - 2y", "y = x^2/2 - x/2 + 1/4 + C/exp(2x)")
                     ]
     od_equation_number = get_function_number(od_equations)
@@ -52,7 +52,7 @@ def solve_ode():
                                str(round(y[i] * 1000000) / 1000000),
                                str(round(od_equation.solution(x[i], c) * 1000000) / 1000000)])
 
-    x_many = sorted([random.random()*(b-x0)+x0 for i in range(100)])
+    x_many = sorted([random.random()*(b-x0)+x0 for i in range(100)] + [x0, x[-1]])
     plots.draw_result(x, y, x_many,
                       lambda _x: od_equation.solution(_x, c),
                       lagrange.get_polynomial(x, y),
@@ -117,14 +117,13 @@ def ode_next_runge_kutta(f, x0, y0, h):
     return y0 + h / 6 * (k1 + 2 * k2 + 2 * k3 + k4)
 
 
-def ode_next_adams(function, x, y, h):
-    f = [function(x[-i], y[-i]) for i in range(4, 0, -1)]
+def ode_next_adams(derivative_f, x, y, h):
+    if len(x) < 4:
+        return ode_next_runge_kutta (derivative_f, x[-1], y[-1], h)
 
-    finite_difference_r1 = f[-1] - f[-2]
-    finite_difference_r2 = f[-1] - 2 * f[-2] + f[-3]
-    finite_difference_r3 = f[-1] - 3 * f[-2] + 3 * f[-3] - f[-4]
+    f = [derivative_f(x[-i], y[-i]) for i in range(4, 0, -1)]
 
-    y_next = y[-1] + h * f[-1] + h * finite_difference_r1 * (1 / 2) + \
-             h * finite_difference_r2 * (5 / 12) + \
-             h * finite_difference_r3 * (3 / 8)
+    y_next = y[-1] + h/24 * (55*f[-1] - 59*f[-2] + 37*f[-3] - 9*f[-4])
+
     return y_next
+

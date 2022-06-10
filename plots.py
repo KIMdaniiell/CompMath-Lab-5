@@ -26,9 +26,10 @@ def draw_polynomial_graph(x_values, function, str_representation):
 
 def draw_result(dots_x, dots_y, test_x, original_function, calculated_function, str_representation):
     figure, axes = plt.subplots()
-    axes.scatter(dots_x, dots_y, marker='o', edgecolors='black', label="Adams method")    # Точки
-    axes.plot(test_x, [original_function(x) for x in test_x], label=str_representation)                 # Ориг ф-ия
-    axes.plot(test_x, [calculated_function(x) for x in test_x], color="red", label="Approximation")     # Получ ф-ия
+    axes.plot(test_x, [original_function(x) for x in test_x], color="red", label="y(x) точная")  # Ориг ф-ия
+    axes.scatter(dots_x, dots_y, marker='o', edgecolors='black', label="Найденные точки")    # Точки
+    axes.scatter(dots_x[0], dots_y[0], marker='o', edgecolors='black', color="yellow", label="Начальное условие")  # Начальное условие
+    axes.plot(dots_x, [calculated_function(x) for x in dots_x],linestyle=":" , color="blue", label="y(x) найденная")     # Получ ф-ия
     axes.set_xlabel("Ось X")
     axes.set_ylabel("Ось Y")
     axes.legend(loc="upper left")
